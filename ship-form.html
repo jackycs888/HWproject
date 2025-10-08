@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>商品資訊</h1>
+    <table border="1">
+        <caption>本月特惠商品</caption>
+        <thead>
+            <tr>
+                <th>商品編號</th>
+                <th>商品名稱</th>
+                <th>規格</th>
+                <th>原價</th>
+                <th>特價</th>
+                <th>庫存</th>
+                <th>評價</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>P001</td>
+                <td>無線藍芽耳機</td>
+                <td>黑色/白色</td>
+                <td>$2,500</td>
+                <td>$1,990</td>
+                <td>25</td>
+                <td>85/100</td>
+            </tr>
+            <tr>
+                <td>P002</td>
+                <td>Type-C充電線</td>
+                <td>1.5公尺</td>
+                <td>$350</td>
+                <td>$200</td>
+                <td>30</td>
+                <td>80/100</td>
+            </tr>
+            <tr>
+                <td>P003</td>
+                <td>行動電源</td>
+                <td>12000mAh</td>
+                <td>900</td>
+                <td>700</td>
+                <td>60</td>
+                <td>75/100</td>
+            </tr>
+            <tr>
+                <td>P004</td>
+                <td>手機支架</td>
+                <td>可調式</td>
+                <td>300</td>
+                <td>200</td>
+                <td>100</td>
+                <td>80/100</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5">總共4項商品</td>
+                <td colspan="2">限時特價中</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h2>訂購表單</h2>
+    <table border="1">
+        <fieldset>
+            <legend>商品選擇</legend>
+            <p>
+                選擇商品:
+            </p>
+            <input type="checkbox" id="earphone" name="goods" value="earphone">
+            <label for="earphone">無線藍芽耳機 - $1990</label>
+            <select name="colors" id="colors">
+                <option value="">請選擇顏色</option>
+                <option value="Red">紅色</option>
+                <option value="Blue">藍色</option>
+                <option value="Black">黑色</option>
+            </select>
+            <label for="ear_value">數量 :</label>
+            <input id="ear_value" name="ear_value" type="number" min="0">
+            <p>
+                <input type="checkbox" id="TypeC" name="goods" value="TypeC">
+                <label for="TypeC">Type-C 充電線 - $200</label>
+                <label for="TypeC_value">數量 :</label>
+                <input id="TypeC_value" name="TypeC_value" type="number" min="0">
+            </p>
+            <p>
+                <input type="checkbox" id="charger" name="goods" value="charger">
+                <label for="charger">行動電源 - $700</label>
+                <label for="charger_value">數量 :</label>
+                <input id="charger_value" name="charger_value" type="number" min="0">
+            </p>
+            <p>
+                <input type="checkbox" id="stand" name="goods" value="stand">
+                <label for="stand">手機支架 - $200</label>
+                <label for="stand_value">數量 :</label>
+                <input id="stand_value" name="stand_value" type="number" min="0">
+            </p>
+        </fieldset>
+        <fieldset>
+            <legend>收件人資訊</legend>
+            <p>
+                <label for="Name">收件人姓名 :</label>
+                <input id="Name" name="Name" type="text" placeholder="請輸入完整性名">
+            </p>
+            <p>
+                <label for="Tel">連絡電話 :</label>
+                <input id="Tel" name="Tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xx-xxx-xxx">
+            </p>
+            <p>
+                <label for="email">電子郵件 :</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email">
+            </p>
+            <p>
+                <label for="address">收件地址 :</label>
+                <p>
+                    <textarea id="address" name="address" rows="6" cols="60" placeholder="請輸入完整地址"></textarea>
+                </p>
+            </p>
+        </fieldset>
+        <fieldset>
+            <legend>配送選項</legend>
+            <p>
+                <label>配送方式 :</label>
+            </p>
+            <p>
+                <input type="radio" id="standard" name="standard" value="standard">
+                <label for="standard">標準配送 (3-5個工作天) - 免費</label>
+            </p>
+            <p>
+                <input type="radio" id="fast" name="fast" value="fast">
+                <label for="fast">快速配送(1-2個工作天) - $100</label>
+            </p>
+            <p>
+                <input type="radio" id="nextDay" name="nextDay" value="nextDay">
+                <label for="nextDay">隔夜送達 - $200</label>
+            </p>
+            <p>
+                <label>希望配送時間 :</label>
+                <select name="Time" id="Time">
+                    <option value="">不指定</option>
+                    <option value="Morning">09:00~12:00</option>
+                    <option value="Afternoon">13:00~17:00</option>
+                    <option value="Night">18:00~22:00</option>
+                </select>
+            </p>
+        </fieldset>
+        <fieldset>
+            <legend>付款方式</legend>
+            <p>
+                <input type="radio" id="credit" name="credit" value="credit">
+                <label for="credit">信用卡付款</label>
+            </p>
+            <p>
+                <input type="radio" id="atm" name="atm" value="atm">
+                <label for="atm">ATM 轉帳</label>
+            </p>
+            <p>
+                <input type="radio" id="cash" name="cash" value="cash">
+                <label for="cash">貨到付款</label>
+            </p>
+        </fieldset>
+        <fieldset>
+            <legend>其他資訊</legend>
+            <p>
+                <label>優惠券代碼 : </label>
+                <input type="text" id="coupon" name="coupon" placeholder="請輸入優惠代碼">
+            </p>
+            <p>
+                <label for="Ex">訂單備註 :</label>
+                <p>
+                    <textarea id="Ex" name="Ex" role="6" cols="60" placeholder="如有特殊需要請在此註明"></textarea>                    
+                </p>
+            </p>
+            <p>
+                <input type="checkbox" id="info" name="info" value="info">
+                <label for="info">我希望收到最新消息與優惠訊息</label>
+            </p>
+            <p>
+                <input type="checkbox" id="agreement" name="agreement" value="agreement">
+                <label for="agreement">我已閱讀並同意<a href="https://www.google.com" target="_blank">購物條款</a>與<a href="ttps://www.w3schools.com/" target="_blank">隱私政策</a></label>
+            </p>
+        </fieldset>
+    </table>
+    <p>
+        <button type="submit">確認訂購</button>
+        <button type="reset">清除重填</button>
+    </p>
+    <p>
+        
+    </p>    
+
+
+</body>
+</html>
