@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      .keypad {
+        display: grid;
+        grid-template-columns: repeat(3, 60px);
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .keypad button {
+        font-size: 18px;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .guessInput {
+        width: 200px;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .guess-btn{
+        font-size: 20px;
+      }
+      .restart-btn{
+        font-size: 20px;
+      }
+    </style>
+      <style>
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+          margin: 0;
+        }
+        .container {
+          background: #fefefe;
+          padding: 40px 30px;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+          text-align: center;
+          width: 350px;
+        }
+        h1 {
+          margin-bottom: 24px;
+          font-size: 2rem;
+          color: #2d3a4a;
+          background: linear-gradient(90deg, #f8ffae 0%, #43c6ac 100%);
+          border-radius: 10px;
+          padding: 10px 0;
+        }
+        .guessInput {
+          padding: 8px;
+          width: 180px;
+          font-size: 1rem;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          margin-bottom: 16px;
+          background: #eaf6ff;
+        }
+        .button-group {
+          display: flex;
+          justify-content: center;
+          gap: 16px;
+          margin-bottom: 16px;
+          background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%);
+          border-radius: 8px;
+          padding: 10px 0;
+        }
+        .guess-btn, .restart-btn {
+          padding: 8px 20px;
+          font-size: 1rem;
+          border: none;
+          border-radius: 6px;
+          background: #4CAF50;
+          color: #fff;
+          cursor: pointer;
+          transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+          box-shadow: 0 2px 8px rgba(76,175,80,0.08);
+        }
+        .guess-btn:hover, .restart-btn:hover {
+          background: #388E3C;
+          box-shadow: 0 6px 18px rgba(76,175,80,0.18);
+          transform: translateY(-4px) scale(1.06);
+        }
+        .answer {
+          margin-top: 16px;
+          font-size: 1.1rem;
+          color: #555;
+          background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%);
+          border-radius: 8px;
+          padding: 8px 0;
+        }
+        .keypad {
+          display: grid;
+          grid-template-columns: repeat(3, 60px);
+          gap: 10px;
+          margin-top: 15px;
+          justify-content: center;
+          background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+          border-radius: 10px;
+          padding: 16px 0 8px 0;
+        }
+        .keypad button {
+          font-size: 18px;
+          padding: 10px;
+          border-radius: 8px;
+          cursor: pointer;
+          background: #e0e0e0;
+          border: none;
+          transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .keypad button:hover {
+          background: #bdbdbd;
+          box-shadow: 0 6px 18px rgba(33,33,33,0.18);
+          transform: translateY(-4px) scale(1.06);
+        }
+      </style>
+  </head>
+    <body>
+      <div class="container">
+        <h1>猜數字遊戲</h1>
+    <input
+      type="text"
+      id="guessInput"
+      class="guessInput"
+      placeholder="用下方鍵盤輸入數字"
+      readonly
+    />
+        <div class="button-group">
+          <button class="guess-btn">猜</button>
+          <button class="restart-btn">重新開始</button>
+        </div>
+        <div class="answer">猜一個數字(1到100之間)</div>
+        <div class="keypad">
+          <button>7</button>
+          <button>8</button>
+          <button>9</button>
+          <button>4</button>
+          <button>5</button>
+          <button>6</button>
+          <button>1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>0</button>
+          <button>C</button>
+        </div>
+      </div>
+      <script>
+      const answer = document.querySelector(".answer");
+      const input = document.querySelector(".guessInput");
+      const btn = document.querySelector(".guess-btn");
+      const restartBtn = document.querySelector(".restart-btn");
+      
+
+      document.querySelector(".keypad").addEventListener("click", function (e) {
+        if (e.target.tagName !== "BUTTON") return;
+        const value = e.target.textContent;
+
+        if (!isNaN(value)) {
+          input.value += e.target.textContent;
+        } else if (value === "C") {
+          input.value = "";
+        }
+      });
+
+      let validMin = 1;
+      let validMax = 100;
+      let hintMin = 1;
+      let hintMax = 100;
+      let goalNumber = getRandom(1, 100);
+
+      document
+        .querySelector(".guess-btn")
+        .addEventListener("click", function () {
+          const userInput = Number(input.value);
+          if (
+            isNaN(userInput) ||
+            userInput < validMin ||
+            userInput > validMax
+          ) {
+            answer.textContent = `請輸入 ${validMin} 到 ${validMax} 的有效數字 !`;
+            input.value = "";
+            return;
+          }
+          if (userInput === goalNumber) {
+            answer.textContent = `猜對了 ! 正確數字是 ${goalNumber}`;
+            btn.disabled = true;
+          } else if (userInput < goalNumber) {
+            hintMin = userInput;
+            answer.textContent = `太小了 ! 數字在 ${hintMin} 到 ${hintMax} 之間`;
+            validMin = userInput + 1;
+          } else {
+            hintMax = userInput;
+            answer.textContent = `太大了 ! 數字在 ${hintMin} 到 ${hintMax} 之間`;
+            validMax = userInput - 1;
+          }
+          input.value = "";
+        });
+      restartBtn.addEventListener("click", function () {
+        goalNumber = getRandom(1, 100);
+        validMin = 1;
+        validMax = 100;
+        hintMin = 1;
+        hintMax = 100;
+        input.value = "";
+        answer.textContent = "猜一個數字(1到100之間)";
+        btn.disabled = false;
+        console.log(`新生成的數字為 : ${goalNumber}`)
+      });
+
+      function getRandom(min, max) {
+        const minCeil = Math.ceil(min);
+        const maxFloor = Math.floor(max);
+        return Math.floor(Math.random() * (maxFloor - minCeil + 1) + minCeil);
+      }
+
+      console.log(goalNumber);
+    </script>
+  </body>
+</html>
