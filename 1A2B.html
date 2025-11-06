@@ -13,11 +13,13 @@
 <body>
 
   <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-5">
-        <div class="card shadow-sm">
+    <h1 class="h3 text-primary text-center mb-4">猜數字遊戲 (1A2B)</h1>
+    <div class="row g-4">
+      <!-- 左側：操作區 -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
           <div class="card-body">
-            <h1 class="h3 text-primary text-center mb-4">猜數字遊戲 (1A2B)</h1>
+            <h2 class="h5 text-secondary mb-3">操作面板</h2>
 
             <div class="mb-3">
               <label for="guessInput" class="form-label">請輸入 4 位不重複數字</label>
@@ -48,10 +50,18 @@
               <button id="btnRestart" type="button" class="btn btn-success">重新開始</button>
               <button id="btnShowAnswer" type="button" class="btn btn-warning">顯示答案（測試）</button>
             </div>
-
             <div id="result" class="alert alert-info mt-3 mb-0" role="alert">請開始猜！</div>
+          </div>
+        </div>
+      </div>
 
-            <ul id="history" class="list-group mt-3" style="max-height: 220px; overflow-y: auto;"></ul>
+      <!-- 右側：歷程紀錄 -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body d-flex flex-column">
+            <h2 class="h5 text-secondary mb-3">歷程紀錄</h2>
+            <ul id="history" class="list-group flex-grow-1" style="max-height: 420px; overflow-y: auto;"></ul>
+            <div class="mt-3 small text-muted">顯示每次猜測的結果（格式：第 N 次：猜測 → 幾 A 幾 B）。</div>
           </div>
         </div>
       </div>
