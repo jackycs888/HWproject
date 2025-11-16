@@ -34,7 +34,7 @@
 									>
 									<input
 										type="text"
-										id="guessInput"
+										v-model="guess"
 										class="form-control"
 										placeholder="例如：1234"
 										inputmode="numeric"
@@ -159,9 +159,7 @@
 									>
 								</div>
 								<div class="d-flex justify-content-center gap-2 flex-wrap">
-									<button id="btnGuess" type="button" class="btn btn-primary">
-										猜！
-									</button>
+									<button @click="doGuess">猜！</button>
 									<button id="btnRestart" type="button" class="btn btn-success">
 										重新開始
 									</button>
@@ -215,27 +213,69 @@
 						history: [],
 					};
 				},
-				method: {},
+				methods: {
+					doGuess() {
+						// const inputEl = document.getElementById("guessInput");
+						// const guess = inputEl.value.trim();
+						const guess = this.guess.trim();
+
+						if (!isValidGuess(guess)) {
+							setResult("❌ 請輸入4位不重複的數字！", "danger");
+							return;
+						}
+						// attempts++;
+						// const result = checkGuess(answer, guess);
+						this.attempts++;
+						const result = checkGuess(this.answer, guess);
+
+						// const li = document.createElement("li");
+						// li.className = "list-group-item";
+						// li.textContent = `第 ${attempts} 次：${guess} → ${result}`;
+						// document.getElementById("history").appendChild(li);
+
+						this.history.push({ guess, result });
+
+						if (result === "4A0B") {
+							setResult(`🎉 恭喜答對！共猜了 ${attempts} 次！`, "success");
+							alert(`答對了！答案是 ${answer}\n總共猜了 ${attempts} 次。`);
+						} else {
+							setResult(`結果：${result}`, "secondary");
+						}
+
+						inputEl.value = "";
+						inputEl.focus();
+						updateKeypad();
+					},
+					startNewGame() {
+						this.answer = generateAnswer();
+						attempts = 0;
+						document.getElementById("history").innerHTML = "";
+						document.getElementById("result").textContent =
+							"已產生新題目，請開始猜！";
+						document.getElementById("guessInput").value = "";
+						console.log("DEBUG 答案:", answer); // 可移除
+					},
+				},
 				mounted() {
 					this.startNewGame();
 				},
 			});
 
-      app.mount('#app');
+			app.mount("#app");
 
-			let answer = "";
-			let attempts = 0;
+			// let answer = "";
+			// let attempts = 0;
 
 			// 初始化
-			function startNewGame() {
-				answer = generateAnswer();
-				attempts = 0;
-				document.getElementById("history").innerHTML = "";
-				document.getElementById("result").textContent =
-					"已產生新題目，請開始猜！";
-				document.getElementById("guessInput").value = "";
-				console.log("DEBUG 答案:", answer); // 可移除
-			}
+			// function startNewGame() {
+			// 	this.answer = generateAnswer();
+			// 	attempts = 0;
+			// 	document.getElementById("history").innerHTML = "";
+			// 	document.getElementById("result").textContent =
+			// 		"已產生新題目，請開始猜！";
+			// 	document.getElementById("guessInput").value = "";
+			// 	console.log("DEBUG 答案:", answer); // 可移除
+			// }
 
 			// 產生不重複四位數字
 			function generateAnswer() {
@@ -282,34 +322,34 @@
 				resultEl.className = `alert alert-${type} mt-3 mb-0`;
 			}
 
-			function doGuess() {
-				const inputEl = document.getElementById("guessInput");
-				const guess = inputEl.value.trim();
+			// function doGuess() {
+			// 	const inputEl = document.getElementById("guessInput");
+			// 	const guess = inputEl.value.trim();
 
-				if (!isValidGuess(guess)) {
-					setResult("❌ 請輸入4位不重複的數字！", "danger");
-					return;
-				}
+			// 	if (!isValidGuess(guess)) {
+			// 		setResult("❌ 請輸入4位不重複的數字！", "danger");
+			// 		return;
+			// 	}
 
-				attempts++;
-				const result = checkGuess(answer, guess);
+			// 	attempts++;
+			// 	const result = checkGuess(answer, guess);
 
-				const li = document.createElement("li");
-				li.className = "list-group-item";
-				li.textContent = `第 ${attempts} 次：${guess} → ${result}`;
-				document.getElementById("history").appendChild(li);
+			// 	const li = document.createElement("li");
+			// 	li.className = "list-group-item";
+			// 	li.textContent = `第 ${attempts} 次：${guess} → ${result}`;
+			// 	document.getElementById("history").appendChild(li);
 
-				if (result === "4A0B") {
-					setResult(`🎉 恭喜答對！共猜了 ${attempts} 次！`, "success");
-					alert(`答對了！答案是 ${answer}\n總共猜了 ${attempts} 次。`);
-				} else {
-					setResult(`結果：${result}`, "secondary");
-				}
+			// 	if (result === "4A0B") {
+			// 		setResult(`🎉 恭喜答對！共猜了 ${attempts} 次！`, "success");
+			// 		alert(`答對了！答案是 ${answer}\n總共猜了 ${attempts} 次。`);
+			// 	} else {
+			// 		setResult(`結果：${result}`, "secondary");
+			// 	}
 
-				inputEl.value = "";
-				inputEl.focus();
-				updateKeypad();
-			}
+			// 	inputEl.value = "";
+			// 	inputEl.focus();
+			// 	updateKeypad();
+			// }
 
 			// 猜按鈕事件
 			document.getElementById("btnGuess").addEventListener("click", doGuess);
