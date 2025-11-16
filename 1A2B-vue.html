@@ -3,12 +3,14 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>猜數字遊戲 (1A2B)</title>
+		<title>猜數字遊戲 (1A2B) - Vue.js 版</title>
 		<!-- Bootstrap CSS -->
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 			rel="stylesheet"
 		/>
+		<!-- Vue 3 CDN -->
+		<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 		<style>
 			body {
 				font-family: "Microsoft JhengHei", system-ui, -apple-system, Segoe UI,
@@ -21,114 +23,55 @@
 	<body>
 		<div id="app">
 			<div class="container py-5">
-				<h1 class="h3 text-primary text-center mb-4">猜數字遊戲 (1A2B)</h1>
+				<h1 class="h3 text-primary text-center mb-4">
+					猜數字遊戲 (1A2B) - Vue.js 版
+				</h1>
 				<div class="row g-4">
 					<!-- 左側：操作區 -->
 					<div class="col-12 col-lg-6">
 						<div class="card shadow-sm h-100">
 							<div class="card-body">
 								<h2 class="h5 text-secondary mb-3">操作面板</h2>
+
 								<div class="mb-3">
 									<label for="guessInput" class="form-label"
 										>請輸入 4 位不重複數字</label
 									>
 									<input
 										type="text"
+										id="guessInput"
 										v-model="guess"
+										@keydown.enter="doGuess"
+										@input="filterInput"
 										class="form-control"
 										placeholder="例如：1234"
 										inputmode="numeric"
 										maxlength="4"
+										ref="guessInput"
 									/>
 								</div>
+
 								<div class="mb-2">
 									<label class="form-label">數字按鈕</label>
-									<div id="keypad" class="row g-2">
-										<div class="col-4">
+									<div class="row g-2">
+										<div
+											v-for="digit in keypadDigits"
+											:key="digit"
+											class="col-4"
+										>
 											<button
 												type="button"
+												:disabled="isDigitDisabled(digit)"
+												@click="addDigit(digit)"
 												class="btn btn-outline-secondary w-100"
-												data-digit="1"
 											>
-												1
+												{{ digit }}
 											</button>
 										</div>
 										<div class="col-4">
 											<button
 												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="2"
-											>
-												2
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="3"
-											>
-												3
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="4"
-											>
-												4
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="5"
-											>
-												5
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="6"
-											>
-												6
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="7"
-											>
-												7
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="8"
-											>
-												8
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												class="btn btn-outline-secondary w-100"
-												data-digit="9"
-											>
-												9
-											</button>
-										</div>
-										<div class="col-4">
-											<button
-												type="button"
-												id="btnBackspace"
+												@click="backspace"
 												class="btn btn-outline-danger w-100"
 											>
 												⌫
@@ -137,8 +80,9 @@
 										<div class="col-4">
 											<button
 												type="button"
+												@click="addDigit('0')"
+												:disabled="isDigitDisabled('0')"
 												class="btn btn-outline-secondary w-100"
-												data-digit="0"
 											>
 												0
 											</button>
@@ -146,7 +90,7 @@
 										<div class="col-4">
 											<button
 												type="button"
-												id="btnClear"
+												@click="clearInput"
 												class="btn btn-outline-warning w-100"
 											>
 												清除
@@ -158,40 +102,70 @@
 										位數時會自動停用按鈕。</small
 									>
 								</div>
+
 								<div class="d-flex justify-content-center gap-2 flex-wrap">
-									<button @click="doGuess">猜！</button>
-									<button id="btnRestart" type="button" class="btn btn-success">
+									<button
+										@click="doGuess"
+										type="button"
+										class="btn btn-primary"
+									>
+										猜！
+									</button>
+									<button
+										@click="startNewGame"
+										type="button"
+										class="btn btn-success"
+									>
 										重新開始
 									</button>
 									<button
-										id="btnShowAnswer"
+										@click="showAnswer"
 										type="button"
 										class="btn btn-warning"
 									>
 										顯示答案（測試）
 									</button>
 								</div>
-								<div class="mt-3 mb-0" :class="'alert-' + resultType">
-									{{resultText}}
+								<div
+									:class="`alert alert-${resultType} mt-3 mb-0`"
+									role="alert"
+								>
+									{{ resultText }}
 								</div>
 							</div>
 						</div>
 					</div>
+
 					<!-- 右側：歷程紀錄 -->
 					<div class="col-12 col-lg-6">
 						<div class="card shadow-sm h-100">
 							<div class="card-body d-flex flex-column">
-								<h2 class="h5 text-secondary mb-3">歷程紀錄</h2>
+								<h2 class="h5 text-secondary mb-3">
+									歷程紀錄 ({{ history.length }} 次)
+								</h2>
 								<ul
 									class="list-group flex-grow-1"
 									style="max-height: 420px; overflow-y: auto"
 								>
-									<li v-for="(item, index) in history" class="list-group-item">
-										第{{index + 1}} 次: {{item.guess}} -> {{item.result}}
+									<li
+										v-if="history.length === 0"
+										class="list-group-item text-muted text-center"
+									>
+										尚未開始猜測
+									</li>
+									<li
+										v-for="(record, index) in history"
+										:key="index"
+										class="list-group-item"
+										:class="{ 'list-group-item-success': record.result === '4A0B' }"
+									>
+										第 {{ record.attempt }} 次：{{ record.guess }} → {{
+										record.result }}
 									</li>
 								</ul>
 								<div class="mt-3 small text-muted">
-									顯示每次猜測的結果（格式：第 N 次：猜測 → 幾 A 幾 B）。
+									顯示每次猜測的結果（格式：第 N 次：猜測 → 幾 A 幾
+									B）。答對時會以綠色標示。
 								</div>
 							</div>
 						</div>
@@ -201,220 +175,155 @@
 		</div>
 
 		<script>
-			const app = createApp({
+			const { createApp } = Vue;
+
+			createApp({
 				data() {
 					return {
 						guess: "",
-						resultText: "請開始猜",
+						resultText: "請開始猜！",
 						resultType: "info",
 						attempts: 0,
 						answer: "",
 						history: [],
+						keypadDigits: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
 					};
 				},
-				methods: {
-					doGuess() {
-						// const inputEl = document.getElementById("guessInput");
-						// const guess = inputEl.value.trim();
-						const guess = this.guess.trim();
 
-						if (!isValidGuess(guess)) {
-							this.resultText = "❌ 請輸入4位不重複的數字！";
-							this.resultType = "danger";
-							return;
-						}
-						// attempts++;
-						// const result = checkGuess(answer, guess);
-						this.attempts++;
-						const result = checkGuess(this.answer, guess);
-
-						// const li = document.createElement("li");
-						// li.className = "list-group-item";
-						// li.textContent = `第 ${attempts} 次：${guess} → ${result}`;
-						// document.getElementById("history").appendChild(li);
-
-						this.history.push({ guess, result });
-
-						if (result === "4A0B") {
-							this.resultText = `🎉 恭喜答對！共猜了 ${this.attempts} 次！`;
-							this.resultType = "success";
-						} else {
-							this.resultText = `結果：${result}`;
-							this.resultType = "secondary";
-						}
+				computed: {
+					isValidGuess() {
+						return (
+							this.guess.length === 4 &&
+							/^\d+$/.test(this.guess) &&
+							new Set(this.guess).size === 4
+						);
 					},
+				},
+
+				methods: {
+					// 產生不重複四位數字
+					generateAnswer() {
+						let digits = [];
+						while (digits.length < 4) {
+							let d = Math.floor(Math.random() * 10).toString();
+							if (!digits.includes(d)) digits.push(d);
+						}
+						return digits.join("");
+					},
+
+					// 開始新遊戲
 					startNewGame() {
-						this.answer = generateAnswer();
+						this.answer = this.generateAnswer();
 						this.attempts = 0;
 						this.history = [];
-						this.guess = "";
-						this.resultText = "請開始猜";
+						this.resultText = "已產生新題目，請開始猜！";
 						this.resultType = "info";
+						this.guess = "";
 						console.log("DEBUG 答案:", this.answer); // 可移除
 					},
+
+					// 比對猜測結果
+					checkGuess(answer, guess) {
+						let A = 0,
+							B = 0;
+						for (let i = 0; i < 4; i++) {
+							if (guess[i] === answer[i]) A++;
+							else if (answer.includes(guess[i])) B++;
+						}
+						return `${A}A${B}B`;
+					},
+
+					// 執行猜測
+					doGuess() {
+						if (!this.isValidGuess) {
+							this.setResult("❌ 請輸入4位不重複的數字！", "danger");
+							return;
+						}
+
+						this.attempts++;
+						const result = this.checkGuess(this.answer, this.guess);
+
+						// 加入歷史記錄
+						this.history.push({
+							attempt: this.attempts,
+							guess: this.guess,
+							result: result,
+						});
+
+						if (result === "4A0B") {
+							this.setResult(
+								`🎉 恭喜答對！共猜了 ${this.attempts} 次！`,
+								"success"
+							);
+							alert(
+								`答對了！答案是 ${this.answer}\n總共猜了 ${this.attempts} 次。`
+							);
+						} else {
+							this.setResult(`結果：${result}`, "secondary");
+						}
+
+						this.guess = "";
+						this.$nextTick(() => {
+							this.$refs.guessInput.focus();
+						});
+					},
+
+					// 設定結果訊息
+					setResult(message, type = "info") {
+						this.resultText = message;
+						this.resultType = type;
+					},
+
+					// 數字按鈕是否停用
+					isDigitDisabled(digit) {
+						return this.guess.includes(digit) || this.guess.length >= 4;
+					},
+
+					// 新增數字
+					addDigit(digit) {
+						if (this.guess.length >= 4 || this.guess.includes(digit)) return;
+						this.guess += digit;
+						this.$nextTick(() => {
+							this.$refs.guessInput.focus();
+						});
+					},
+
+					// 退格
+					backspace() {
+						this.guess = this.guess.slice(0, -1);
+						this.$nextTick(() => {
+							this.$refs.guessInput.focus();
+						});
+					},
+
+					// 清除輸入
+					clearInput() {
+						this.guess = "";
+						this.$nextTick(() => {
+							this.$refs.guessInput.focus();
+						});
+					},
+
+					// 過濾輸入（僅保留數字，限制長度）
+					filterInput() {
+						const digitsOnly = this.guess.replace(/[^\d]/g, "");
+						this.guess = digitsOnly.slice(0, 4);
+					},
+
+					// 顯示答案（測試用）
+					showAnswer() {
+						alert(`目前的答案是：${this.answer}`);
+					},
 				},
+
 				mounted() {
 					this.startNewGame();
+					// 自動聚焦到輸入框
+					this.$nextTick(() => {
+						this.$refs.guessInput.focus();
+					});
 				},
-			});
-
-			app.mount("#app");
-
-			// let answer = "";
-			// let attempts = 0;
-
-			// 初始化
-			// function startNewGame() {
-			// 	this.answer = generateAnswer();
-			// 	attempts = 0;
-			// 	document.getElementById("history").innerHTML = "";
-			// 	document.getElementById("result").textContent =
-			// 		"已產生新題目，請開始猜！";
-			// 	document.getElementById("guessInput").value = "";
-			// 	console.log("DEBUG 答案:", answer); // 可移除
-			// }
-
-			// 產生不重複四位數字
-			function generateAnswer() {
-				let digits = [];
-				while (digits.length < 4) {
-					let d = Math.floor(Math.random() * 10).toString();
-					if (!digits.includes(d)) digits.push(d);
-				}
-				return digits.join("");
-			}
-
-			// 檢查輸入是否合法
-			function isValidGuess(guess) {
-				if (guess.length !== 4) return false;
-				if (!/^\d+$/.test(guess)) return false;
-				return new Set(guess).size === 4;
-			}
-
-			// 比對猜測結果
-			function checkGuess(answer, guess) {
-				let A = 0,
-					B = 0;
-				for (let i = 0; i < 4; i++) {
-					if (guess[i] === answer[i]) A++;
-					else if (answer.includes(guess[i])) B++;
-				}
-				return `${A}A${B}B`;
-			}
-
-			// 更新數字鍵盤可用狀態
-			// function updateKeypad() {
-			// 	const inputEl = document.getElementById("guessInput");
-			// 	const val = inputEl.value;
-			// 	const len = val.length;
-			// 	document.querySelectorAll("#keypad [data-digit]").forEach((btn) => {
-			// 		const d = btn.getAttribute("data-digit");
-			// 		btn.disabled = val.includes(d) || len >= 4;
-			// 	});
-			// }
-
-			// function setResult(message, type = "info") {
-			// 	const resultEl = document.getElementById("result");
-			// 	resultEl.textContent = message;
-			// 	resultEl.className = `alert alert-${type} mt-3 mb-0`;
-			// }
-
-			// function doGuess() {
-			// 	const inputEl = document.getElementById("guessInput");
-			// 	const guess = inputEl.value.trim();
-
-			// 	if (!isValidGuess(guess)) {
-			// 		setResult("❌ 請輸入4位不重複的數字！", "danger");
-			// 		return;
-			// 	}
-
-			// 	attempts++;
-			// 	const result = checkGuess(answer, guess);
-
-			// 	const li = document.createElement("li");
-			// 	li.className = "list-group-item";
-			// 	li.textContent = `第 ${attempts} 次：${guess} → ${result}`;
-			// 	document.getElementById("history").appendChild(li);
-
-			// 	if (result === "4A0B") {
-			// 		setResult(`🎉 恭喜答對！共猜了 ${attempts} 次！`, "success");
-			// 		alert(`答對了！答案是 ${answer}\n總共猜了 ${attempts} 次。`);
-			// 	} else {
-			// 		setResult(`結果：${result}`, "secondary");
-			// 	}
-
-			// 	inputEl.value = "";
-			// 	inputEl.focus();
-			// 	updateKeypad();
-			// }
-
-			// 猜按鈕事件
-			// document.getElementById("btnGuess").addEventListener("click", doGuess);
-
-			// 輸入框 Enter 也可觸發
-			// document
-			// 	.getElementById("guessInput")
-			// 	.addEventListener("keydown", function (e) {
-			// 		if (e.key === "Enter") {
-			// 			doGuess();
-			// 		}
-			// 	});
-
-			// // 輸入框內容變更時，同步更新鍵盤狀態（僅保留數字，限制長度）
-			// document
-			// 	.getElementById("guessInput")
-			// 	.addEventListener("input", function () {
-			// 		const digitsOnly = this.value.replace(/[^\d]/g, "");
-			// 		this.value = digitsOnly.slice(0, 4);
-			// 		updateKeypad();
-			// 	});
-
-			// // 重新開始按鈕
-			// document
-			// 	.getElementById("btnRestart")
-			// 	.addEventListener("click", startNewGame);
-
-			// // 顯示答案按鈕（測試用）
-			// document
-			// 	.getElementById("btnShowAnswer")
-			// 	.addEventListener("click", function () {
-			// 		alert(`目前的答案是：${answer}`);
-			// 	});
-
-			// // 數字鍵盤事件委派
-			// document.getElementById("keypad").addEventListener("click", function (e) {
-			// 	const btn = e.target.closest("button[data-digit]");
-			// 	if (!btn) return;
-			// 	const inputEl = document.getElementById("guessInput");
-			// 	const val = inputEl.value;
-			// 	const d = btn.getAttribute("data-digit");
-			// 	if (val.length >= 4 || val.includes(d)) return;
-			// 	inputEl.value = val + d;
-			// 	updateKeypad();
-			// 	inputEl.focus();
-			// });
-
-			// // 退格與清除
-			// document
-			// 	.getElementById("btnBackspace")
-			// 	.addEventListener("click", function () {
-			// 		const inputEl = document.getElementById("guessInput");
-			// 		inputEl.value = inputEl.value.slice(0, -1);
-			// 		updateKeypad();
-			// 		inputEl.focus();
-			// 	});
-			// document
-			// 	.getElementById("btnClear")
-			// 	.addEventListener("click", function () {
-			// 		const inputEl = document.getElementById("guessInput");
-			// 		inputEl.value = "";
-			// 		updateKeypad();
-			// 		inputEl.focus();
-			// 	});
-
-			// // 初始化遊戲
-			// startNewGame();
-			// updateKeypad();
+			}).mount("#app");
 		</script>
 
 		<!-- Bootstrap JS (包含 Popper) -->
